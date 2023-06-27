@@ -1,6 +1,13 @@
 import Image from 'next/image';
 
-function LargeCard({ img, title, description, buttonText }: any) {
+interface LargeCard {
+  img: string;
+  title: string;
+  description: string;
+  buttonText: string;
+}
+
+export default function LargeCard({ img, title, description, buttonText }: LargeCard) {
   return (
     <>
       <div className="relative h-96 min-w-[300px]">
@@ -22,5 +29,3 @@ function LargeCard({ img, title, description, buttonText }: any) {
     </>
   );
 }
-
-export default LargeCard;

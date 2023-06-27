@@ -4,10 +4,14 @@ import Image from 'next/image';
 import { useState } from 'react';
 import 'react-date-range/dist/styles.css';
 import 'react-date-range/dist/theme/default.css';
-import { DateRangePicker } from 'react-date-range';
+import { DateRangePicker, RangeKeyDict } from 'react-date-range';
 import { useRouter } from 'next/navigation';
 
-function Header() {
+interface Header {
+  placeholder?: string;
+}
+
+export default function Header({ placeholder }: Header) {
   const [searchInput, setSearchInput] = useState('');
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
@@ -15,9 +19,9 @@ function Header() {
 
   const router = useRouter();
 
-  const handleSelect = (ranges: any) => {
-    setStartDate(ranges.selection.startDate);
-    setEndDate(ranges.selection.endDate);
+  const handleSelect = (ranges: RangeKeyDict) => {
+    setStartDate(ranges.selection?.startDate ?? startDate);
+    setEndDate(ranges.selection?.endDate ?? endDate);
   };
 
   const resetInput = () => {
@@ -25,7 +29,18 @@ function Header() {
   };
 
   const search = () => {
-    router.push('/search');
+    const query = {
+      location: searchInput,
+      startDate: startDate.toISOString(),
+      endDate: endDate.toISOString(),
+      numberOfGuests,
+    };
+
+    const queryString = Object.entries(query)
+      .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
+      .join('&');
+
+    router.push('/search?' + queryString);
   };
 
   const selectionRange = {
@@ -41,7 +56,7 @@ function Header() {
         className="relative flex items-center h-18 cursor-pointer my-auto"
       >
         <Image
-          src="https://links.papareact.com/qd3"
+          src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/69/Airbnb_Logo_B%C3%A9lo.svg/2560px-Airbnb_Logo_B%C3%A9lo.svg.png"
           height={100}
           width={100}
           alt="airbnb"
@@ -53,7 +68,7 @@ function Header() {
           value={searchInput}
           onChange={(e) => setSearchInput(e.target.value)}
           type="text"
-          placeholder="Start your search"
+          placeholder={placeholder || 'Start your search'}
           className=" flex-grow pl-5 bg-transparent outline-none text-sm text-gray-600 placeholder-gray-400"
         />
         <svg
@@ -63,6 +78,7 @@ function Header() {
           strokeWidth={1.5}
           stroke="currentColor"
           className="hidden md:inline-flex h-8 bg-red-400 text-white rounded-full p-2 cursor-pointer mx-2"
+          onClick={search}
         >
           <path
             strokeLinecap="round"
@@ -162,5 +178,3 @@ function Header() {
     </header>
   );
 }
-
-export default Header;
